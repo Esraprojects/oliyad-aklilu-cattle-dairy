@@ -1,0 +1,240 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  WORKER
+}
+
+enum CattleStatus {
+  ACTIVE
+  SOLD
+  DECEASED
+  TRANSFERRED
+}
+
+enum CattleGender {
+  MALE
+  FEMALE
+}
+
+enum CattleCategory {
+  FATTENING
+  DAIRY
+  BREEDING
+  CALF
+}
+
+enum SaleType {
+  CATTLE
+  MILK
+  DAIRY_PRODUCT
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  PARTIAL
+}
+
+model User {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  password     String
+  role         Role      @default(WORKER)
+  phone        String?
+  avatar       String?
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  employees    Employee[]
+  sales        Sale[]
+  feedingLogs  FeedingLog[]
+  milkRecords  MilkRecord[]
+}
+
+model Cattle {
+  id              String         @id @default(cuid())
+  tagNumber       String         @unique
+  name            String?
+  breed           String
+  gender          CattleGender
+  category        CattleCategory
+  status          CattleStatus   @default(ACTIVE)
+  birthDate       DateTime?
+  purchaseDate    DateTime       @default(now())
+  purchasePrice   Float
+  currentWeight   Float
+  initialWeight   Float
+  targetWeight    Float?
+  color           String?
+  description     String?
+  imageUrl        String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  weightRecords   WeightRecord[]
+  healthRecords   HealthRecord[]
+  feedingLogs     FeedingLog[]
+  milkRecords     MilkRecord[]
+  saleItems       SaleItem[]
+}
+
+model WeightRecord {
+  id          String   @id @default(cuid())
+  cattleId    String
+  weight      Float
+  recordedAt  DateTime @default(now())
+  notes       String?
+  cattle      Cattle   @relation(fields: [cattleId], references: [id], onDelete: Cascade)
+}
+
+model HealthRecord {
+  id           String   @id @default(cuid())
+  cattleId     String
+  type         String
+  description  String
+  treatment    String?
+  veterinarian String?
+  cost         Float    @default(0)
+  recordedAt   DateTime @default(now())
+  nextCheckup  DateTime?
+  cattle       Cattle   @relation(fields: [cattleId], references: [id], onDelete: Cascade)
+}
+
+model Feed {
+  id          String       @id @default(cuid())
+  name        String
+  nameAm      String
+  type        String
+  unit        String
+  costPerUnit Float
+  stockQty    Float        @default(0)
+  minStock    Float        @default(10)
+  description String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  feedingLogs FeedingLog[]
+}
+
+model FeedingLog {
+  id         String   @id @default(cuid())
+  cattleId   String
+  feedId     String
+  quantity   Float
+  cost       Float
+  fedAt      DateTime @default(now())
+  notes      String?
+  recordedBy String
+  cattle     Cattle   @relation(fields: [cattleId], references: [id], onDelete: Cascade)
+  feed       Feed     @relation(fields: [feedId], references: [id])
+  user       User     @relation(fields: [recordedBy], references: [id])
+}
+
+model MilkRecord {
+  id           String   @id @default(cuid())
+  cattleId     String
+  liters       Float
+  session      String
+  fatContent   Float?
+  proteinContent Float?
+  recordedAt   DateTime @default(now())
+  recordedBy   String
+  notes        String?
+  cattle       Cattle   @relation(fields: [cattleId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [recordedBy], references: [id])
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String?
+  email     String?
+  address   String?
+  tinNumber String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sales     Sale[]
+}
+
+model Sale {
+  id            String        @id @default(cuid())
+  invoiceNumber String        @unique
+  customerId    String?
+  type          SaleType
+  totalAmount   Float
+  paidAmount    Float         @default(0)
+  status        PaymentStatus @default(PENDING)
+  saleDate      DateTime      @default(now())
+  dueDate       DateTime?
+  notes         String?
+  soldBy        String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  customer      Customer?     @relation(fields: [customerId], references: [id])
+  user          User          @relation(fields: [soldBy], references: [id])
+  items         SaleItem[]
+}
+
+model SaleItem {
+  id          String  @id @default(cuid())
+  saleId      String
+  cattleId    String?
+  description String
+  quantity    Float
+  unitPrice   Float
+  totalPrice  Float
+  sale        Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  cattle      Cattle? @relation(fields: [cattleId], references: [id])
+}
+
+model Employee {
+  id          String   @id @default(cuid())
+  userId      String?  @unique
+  name        String
+  phone       String?
+  position    String
+  salary      Float
+  hireDate    DateTime @default(now())
+  isActive    Boolean  @default(true)
+  address     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User?    @relation(fields: [userId], references: [id])
+  payrolls    Payroll[]
+}
+
+model Payroll {
+  id           String   @id @default(cuid())
+  employeeId   String
+  month        Int
+  year         Int
+  baseSalary   Float
+  bonus        Float    @default(0)
+  deductions   Float    @default(0)
+  netSalary    Float
+  paidAt       DateTime?
+  isPaid       Boolean  @default(false)
+  notes        String?
+  createdAt    DateTime @default(now())
+  employee     Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, month, year])
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  category    String
+  description String
+  amount      Float
+  date        DateTime @default(now())
+  receipt     String?
+  createdAt   DateTime @default(now())
+}
