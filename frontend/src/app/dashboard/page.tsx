@@ -134,8 +134,8 @@ export default function DashboardPage() {
                 <XAxis dataKey="date" tick={{ fontSize: 11 }}
                   tickFormatter={d => d ? format(new Date(d), 'MMM d') : ''} />
                 <YAxis tick={{ fontSize: 11 }} />
-                <Tooltip formatter={(v: number) => [`${v}L`, 'Milk']}
-                  labelFormatter={d => format(new Date(d), 'MMM d, yyyy')} />
+                <Tooltip formatter={(v) => `${Number(v ?? 0).toFixed(1)}L`}
+                  labelFormatter={(d) => format(new Date(String(d)), 'MMM d, yyyy')} />
                 <Area type="monotone" dataKey="liters" stroke="#40916C" fill="url(#milkGrad)" strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>

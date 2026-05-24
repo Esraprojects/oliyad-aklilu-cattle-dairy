@@ -176,7 +176,7 @@ export default function DairyPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis dataKey="date" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 11 }} />
-                <Tooltip formatter={(v: number) => [`${v}L`, 'Milk']} />
+                <Tooltip formatter={(v) => `${Number(v ?? 0).toFixed(1)}L`} />
                 <Bar dataKey="liters" fill="#0369A1" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>

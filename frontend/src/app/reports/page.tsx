@@ -92,7 +92,7 @@ export default function ReportsPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                   <XAxis dataKey="tagNumber" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} />
-                  <Tooltip formatter={(v: number, n: string) => [`${v}kg`, n === 'gain' ? 'Weight Gain' : 'Current']} />
+                  <Tooltip formatter={(v, n) => [`${Number(v ?? 0)}kg`, n === 'gain' ? 'Weight Gain' : 'Current']} />
                   <Bar dataKey="gain" fill="#1B4332" radius={[4, 4, 0, 0]} name="gain" />
                   <Bar dataKey="currentWeight" fill="#D8F3DC" radius={[4, 4, 0, 0]} name="currentWeight" />
                 </BarChart>
@@ -203,7 +203,7 @@ export default function ReportsPage() {
                     {salesData.byType.map((_: unknown, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                   </Pie>
                   <Legend />
-                  <Tooltip formatter={(v: number) => `ETB ${v.toLocaleString()}`} />
+                  <Tooltip formatter={(v) => `ETB ${Number(v ?? 0).toLocaleString()}`} />
                 </PieChart>
               </div>
             )}
