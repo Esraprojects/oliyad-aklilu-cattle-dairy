@@ -32,8 +32,8 @@ This platform provides complete digital management for every aspect of the farm:
 
 | Service | URL |
 |---------|-----|
-| 🌐 Frontend | [Deployed on Vercel](#) |
-| ⚙️ Backend API | [Deployed on Railway](#) |
+| 🌐 Frontend | [https://oliyad-aklilu-cattle-dairy.vercel.app](https://oliyad-aklilu-cattle-dairy.vercel.app) |
+| ⚙️ Backend API | [https://oliyad-aklilu-cattle-dairy-api.vercel.app](https://oliyad-aklilu-cattle-dairy-api.vercel.app) |
 
 **Demo Credentials / የሙከራ መረጃ:**
 | Role | Email | Password |
